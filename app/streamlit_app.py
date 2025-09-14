@@ -1,45 +1,66 @@
 import streamlit as st
-import pandas as pd
-from sqlalchemy import text
 import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from app.db import engine
+
 from app.load_data import main as load_data_main
-from views import create_views
+from app.views import create_views
+from app import dashboard
 
-# 1 Carrega os dados do CSV e cria as views
-load_data_main()
-create_views()
+# =========================
+# 1. Configuração da página
+# =========================
+st.set_page_config(
+    page_title="Dashboard IoT",
+    page_icon="🚀",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-st.title("Dashboard IoT 🚀")
+# =========================
+# 2. Carregamento inicial
+# =========================
+with st.spinner("Carregando dados e criando views..."):
+    load_data_main()
+    create_views()
 
-# 2 Menu lateral para escolher a view
+# =========================
+# 3. Cabeçalho e introdução
+# =========================
+st.title("📊 Dashboard IoT")
+st.markdown("""
+Bem-vindo ao **Painel de Monitoramento IoT**!  
+Aqui você pode explorar dados de temperatura coletados por dispositivos IoT, com diferentes formas de visualização.
+
+Use o menu lateral para escolher a análise desejada.
+""")
+
+# =========================
+# 4. Menu lateral
+# =========================
+st.sidebar.header("⚙️ Configurações")
+st.sidebar.markdown("Selecione abaixo a visualização que deseja explorar:")
+
 view_options = {
-    "Média de temperatura por dispositivo": "avg_temp_por_dispositivo",
-    "Leituras por hora": "leituras_por_hora",
-    "Temperaturas máxima e mínima por dia": "temp_max_min_por_dia",
-    "Diferença In vs Out por dia": "temp_in_out_por_dia"
+    "📈 Média de temperatura por dispositivo": dashboard.grafico_media_por_dispositivo,
+    "⏰ Leituras por hora": dashboard.grafico_leituras_por_hora,
+    "🌡️ Temperaturas máxima e mínima por dia": dashboard.grafico_temp_max_min,
+    "🏠 vs 🌳 Diferença In vs Out por dia": dashboard.grafico_temp_in_out
 }
 
-selected_view = st.sidebar.selectbox("Escolha a view", list(view_options.keys()))
-query = f"SELECT * FROM {view_options[selected_view]}"
+selected_view = st.sidebar.selectbox("Escolha a visualização", list(view_options.keys()))
 
-# 3 Puxar os dados do banco
-with engine.connect() as conn:
-    df = pd.read_sql(text(query), conn)
+# =========================
+# 5. Renderização da view
+# =========================
+st.markdown(f"### {selected_view}")
+view_options[selected_view]()  # Executa a função correspondente
 
-# 4 Mostrar tabela
-st.subheader(selected_view)
-st.dataframe(df)
+# =========================
+# 6. Rodapé
+# =========================
+st.markdown("---")
+st.caption("Projeto desenvolvido por Zulenice • Dados simulados para fins acadêmicos")
 
-# 5 Mostrar gráfico dependendo da view
-if not df.empty:
-    if selected_view == "Média de temperatura por dispositivo":
-        st.bar_chart(df.set_index("device_id")["avg_temp"])
-    elif selected_view == "Leituras por hora":
-        st.line_chart(df.set_index("hora")["contagem"])
-    elif selected_view == "Temperaturas máxima e mínima por dia":
-        st.line_chart(df.set_index("data")[["temp_max", "temp_min"]])
-    elif selected_view == "Diferença In vs Out por dia":
-        st.line_chart(df.set_index("data")[["temp_in", "temp_out", "diff_in_out"]])
+
+
 

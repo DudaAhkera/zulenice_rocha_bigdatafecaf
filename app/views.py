@@ -52,10 +52,10 @@ def create_views():
             conn.execute(text("""
                 CREATE OR REPLACE VIEW temp_in_out_por_dia AS
                 SELECT DATE(timestamp) AS data,
-                    AVG(CASE WHEN location_type='in' THEN temperature END) AS temp_in,
-                    AVG(CASE WHEN location_type='out' THEN temperature END) AS temp_out,
-                    AVG(CASE WHEN location_type='in' THEN temperature END) - 
-                    AVG(CASE WHEN location_type='out' THEN temperature END) AS diff_in_out
+                    AVG(CASE WHEN location_type='In' THEN temperature END) AS temp_in,
+                    AVG(CASE WHEN location_type='Out' THEN temperature END) AS temp_out,
+                    AVG(CASE WHEN location_type='In' THEN temperature END) - 
+                    AVG(CASE WHEN location_type='Out' THEN temperature END) AS diff_in_out
                 FROM iot_temp
                 GROUP BY DATE(timestamp)
                 ORDER BY data;
@@ -65,4 +65,3 @@ def create_views():
             print(f"Erro ao criar temp_in_out_por_dia: {e}")
             
 
-        print("Views criadas com sucesso!")

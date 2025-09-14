@@ -14,10 +14,10 @@ def check_connection():
     try:
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
-        print("✅ Conexão com o banco estabelecida com sucesso!")
+        print("Conexão com o banco estabelecida com sucesso!")
         return True
     except Exception as e:
-        print(f"❌ Erro ao conectar no banco: {e}")
+        print(f"Erro ao conectar no banco: {e}")
         return False
 
 def check_table():
@@ -26,9 +26,9 @@ def check_table():
     if "iot_temp" in tables:
         with engine.connect() as conn:
             count = conn.execute(text("SELECT COUNT(*) FROM iot_temp")).scalar()
-        print(f"✅ Tabela 'iot_temp' encontrada com {count} registros.")
+        print(f"Tabela 'iot_temp' encontrada com {count} registros.")
     else:
-        print("❌ Tabela 'iot_temp' não encontrada!")
+        print("Tabela 'iot_temp' não encontrada!")
 
 def check_views():
     views = [
@@ -41,9 +41,9 @@ def check_views():
         for v in views:
             try:
                 count = conn.execute(text(f"SELECT COUNT(*) FROM {v}")).scalar()
-                print(f"✅ View '{v}' encontrada com {count} registros.")
+                print(f"View '{v}' encontrada com {count} registros.")
             except Exception as e:
-                print(f"❌ View '{v}' não encontrada ou erro ao consultar: {e}")
+                print(f"View '{v}' não encontrada ou erro ao consultar: {e}")
 
 if __name__ == "__main__":
     if check_connection():

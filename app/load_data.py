@@ -33,6 +33,14 @@ def main():
             "temp": "temperature",
             "out/in": "location_type"
         }, inplace=True)
+        
+        df["location_type"] = (
+    df["location_type"]
+      .astype(str)
+      .str.strip()         # remove espaços antes/depois
+      .str.lower()         # tudo minúsculo
+      .str.title()         # capitaliza só a primeira letra
+)
 
         # Converter timestamp
         try:
@@ -56,7 +64,6 @@ def main():
             print(f"Erro ao inserir dados no banco: {e}")
             return
 
-        print("Dados carregados com sucesso no PostgreSQL!")
 
     except Exception as e:
         print(f"Erro inesperado: {e}")
