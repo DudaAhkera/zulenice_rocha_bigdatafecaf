@@ -1,10 +1,10 @@
-from db import engine
+from app.db import engine
 from sqlalchemy import text
 
 
 # Conectar e criar views
 def create_views():
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         try:
             # Média de temperatura por dispositivo
             conn.execute(text("""

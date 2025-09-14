@@ -1,17 +1,19 @@
 import streamlit as st
 import pandas as pd
 from sqlalchemy import text
-from db import engine
-from load_data import main as load_data_main
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from app.db import engine
+from app.load_data import main as load_data_main
 from views import create_views
 
-# 1️⃣ Carrega os dados do CSV e cria as views
+# 1 Carrega os dados do CSV e cria as views
 load_data_main()
 create_views()
 
 st.title("Dashboard IoT 🚀")
 
-# 2️⃣ Menu lateral para escolher a view
+# 2 Menu lateral para escolher a view
 view_options = {
     "Média de temperatura por dispositivo": "avg_temp_por_dispositivo",
     "Leituras por hora": "leituras_por_hora",
@@ -22,15 +24,15 @@ view_options = {
 selected_view = st.sidebar.selectbox("Escolha a view", list(view_options.keys()))
 query = f"SELECT * FROM {view_options[selected_view]}"
 
-# 3️⃣ Puxar os dados do banco
+# 3 Puxar os dados do banco
 with engine.connect() as conn:
     df = pd.read_sql(text(query), conn)
 
-# 4️⃣ Mostrar tabela
+# 4 Mostrar tabela
 st.subheader(selected_view)
 st.dataframe(df)
 
-# 5️⃣ Mostrar gráfico dependendo da view
+# 5 Mostrar gráfico dependendo da view
 if not df.empty:
     if selected_view == "Média de temperatura por dispositivo":
         st.bar_chart(df.set_index("device_id")["avg_temp"])

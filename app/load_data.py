@@ -1,9 +1,8 @@
 import pandas as pd
 from sqlalchemy import insert
 from sqlalchemy.exc import SQLAlchemyError
-from db import engine
-from models import metadata, iot_table
-from views import create_views
+from app.db import engine
+from app.models import metadata, iot_table
 
 
 CSV_FILE = "CSV/IOT-temp.csv"
@@ -59,7 +58,6 @@ def main():
 
         print("Dados carregados com sucesso no PostgreSQL!")
 
-        create_views()
     except Exception as e:
         print(f"Erro inesperado: {e}")
 
